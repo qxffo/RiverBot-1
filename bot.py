@@ -9,13 +9,11 @@ client.remove_command('help')
 async def on_ready():
   print('Logged into RiverBot')
   await client.change_presence(status=discord.Status.online, activity=discord.Game('PICKLE RICK!!! | ;help'))
-
+#Clear Command
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, amount=5):
     await ctx.channel.purge(limit=amount)
-
-
 #Help Command
 @client.command(pass_context=True)
 async def help(ctx):
@@ -33,16 +31,19 @@ async def help(ctx):
     await author.send(embed=embed)
 #Kick Command
 @client.command()
+@commands.has_permissions(kick_members=True)
 async def kick(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
     await ctx.send(f'Kicked {member.mention}')
 #Ban Command
 @client.command()
+@commands.has_permissions(ban_members=True)
 async def ban(ctx, member : discord.Member, *, reason=None):
     await member.ban(reason=reason)
     await ctx.send(f'Banned {member.mention}')
 #Unban Command
 @client.command()
+@commands.has_permissions(ban_members=True)
 async def unban(ctx, *, member):
     banned_users = await ctx.guild.bans()
     member_name, member_discriminator = member.split('#')
