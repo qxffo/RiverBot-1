@@ -64,7 +64,7 @@ async def source(ctx):
     )
 
     embed.set_author(name='Source Code')
-    embed.add_field(name='Source', value='https://github.com/qxffo/RiverBot/tree/main', inline=False)
+    embed.add_field(name='Source', value='https://github.com/qxffo/RiverBot-Version-0.0.6', inline=False)
     
     await author.send(embed=embed)
 
