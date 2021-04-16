@@ -2,6 +2,10 @@ import discord
 from discord.ext import commands
 import random
 import json
+import youtube_dl
+
+from music_cog import music_cog
+
 
 def get_prefix(client, message):
     with open('prefixes.json', 'r') as f:
@@ -11,6 +15,9 @@ def get_prefix(client, message):
 
 client = commands.Bot(command_prefix = get_prefix)
 client.remove_command('help')
+
+client.add_cog(music_cog(client))
+
 
 @client.event
 async def on_ready():
@@ -26,6 +33,7 @@ async def on_guild_join(guild):
 
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
+
 
 @client.event
 async def on_guild_remove(guild):
@@ -62,13 +70,24 @@ async def changeprefix(ctx, prefix):
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, amount=5):
     await ctx.channel.purge(limit=amount)
+#Clear Error
+@clear.error
+async def clear_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        
+        embed = discord.Embed(
+        colour = discord.Colour.blue()
+    )
 
+        embed.set_author(name='You do not have permision to use this command!')
+
+        await ctx.send(embed=embed)
 #Kick Command
 @client.command()
 @commands.has_permissions(kick_members=True)
 async def kick(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
-    await ctx.send(f'Kicked {member.mention}')
+    await ctx.send(f'Kicked {member.mention} Reason: {reason}')
 
 #Kick Error
 @kick.error
@@ -88,7 +107,7 @@ async def kick_error(ctx, error):
 @commands.has_permissions(ban_members=True)
 async def ban(ctx, member : discord.Member, *, reason=None):
     await member.ban(reason=reason)
-    await ctx.send(f'Banned {member.mention}')
+    await ctx.send(f'Banned {member.mention} Reason: {reason}')
 
 #Ban Error
 @ban.error
@@ -116,7 +135,11 @@ async def help(ctx):
     embed.add_field(name=';kick', value='Kicks mentioned user', inline=False)
     embed.add_field(name=';ban', value='Bans mentioned user', inline=False)
     embed.add_field(name=';clear', value='Deletes messages.', inline=False)
-    
+    embed.add_field(name=';changeprefix', value='Changes server prefix', inline=False)
+    embed.add_field(name=';play', value='Plays a selected song from youtube', inline=False)
+    embed.add_field(name=';queue', value='Displays the current songs in queue', inline=False)
+    embed.add_field(name=';skip', value='Skips the current song being played', inline=False)
+
     await author.send(embed=embed)
 #Source Command
 @client.command(pass_context=True)
@@ -148,5 +171,7 @@ async def _8ball(ctx, *, question):
                  'Very doubtful.',
                  'Better not tell you now']
     await ctx.send(f'Question: {question}\nAsnwer: {random.choice(responses)}')
+#Mute Command
+
 
 client.run('TOKEN')
